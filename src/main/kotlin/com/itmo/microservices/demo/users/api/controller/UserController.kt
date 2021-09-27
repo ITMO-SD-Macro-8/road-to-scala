@@ -49,4 +49,14 @@ class UserController(private val userService: UserService) {
     )
     fun deleteCurrentUser(@Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails) =
             userService.deleteUser(user)
+
+    @GetMapping("auf")
+    @Operation(
+            summary = "Biba",
+            responses = [
+                ApiResponse(description = "OK", responseCode = "200")
+            ],
+            security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    fun getAuf() = "АУФ"
 }
