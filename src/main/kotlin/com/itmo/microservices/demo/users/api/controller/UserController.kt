@@ -50,7 +50,7 @@ class UserController(private val userService: UserService) {
     fun deleteCurrentUser(@Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails) =
             userService.deleteUser(user)
 
-    @GetMapping("auf")
+    @GetMapping("/auf")
     @Operation(
             summary = "Biba",
             responses = [
