@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.itmo.microservices.demo.delivery.impl.entity.TimeSlot</OriginalElement>
+  <nodes>
+    <node x="-234.0" y="120.0">com.itmo.microservices.demo.delivery.impl.entity.Delivery</node>
+    <node x="449.0" y="288.0">com.itmo.microservices.demo.payment.entity.Payment</node>
+    <node x="-234.0" y="421.0">com.itmo.microservices.demo.delivery.impl.entity.TimeSlot</node>
+  </nodes>
+  <notes />
+  <edges />
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="159.0" y="175.5" />
+  <SelectedNodes>
+    <node>com.itmo.microservices.demo.payment.entity.Payment</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
