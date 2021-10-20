@@ -1,3 +1,3 @@
 package com.itmo.microservices.demo.catalog.model
 
-typealias Catalog = List<Good>
+typealias Catalog = List<GoodsItem>
