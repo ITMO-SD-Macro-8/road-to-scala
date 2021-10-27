@@ -1,6 +1,5 @@
 package com.itmo.microservices.demo.warehouse.model
 
-import com.itmo.microservices.demo.catalog.model.Price
 import java.util.*
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
