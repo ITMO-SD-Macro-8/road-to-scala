@@ -17,6 +17,7 @@
     <description>Demo project for microservices course 21-22</description>
 
     <properties>
+        <junit.version>5.0.0</junit.version>
         <java.version>11</java.version>
         <kotlin.version>1.5.21</kotlin.version>
         <guava.version>30.1.1-jre</guava.version>
@@ -108,6 +109,11 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
         <dependency>
