@@ -18,7 +18,7 @@ class PaymentController(
     private val paymentService: PaymentService
 ) {
 
-    @PostMapping
+    @PostMapping("/make")
     @Operation(
         summary = "Makes payment",
         responses = [
@@ -31,7 +31,7 @@ class PaymentController(
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
     ): Payment = paymentService.makePayment(model)
 
-    @PutMapping
+    @PostMapping("/rollback")
     @Operation(
         summary = "Rollbacks payment",
         responses = [
@@ -44,7 +44,7 @@ class PaymentController(
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
     ) = paymentService.rollbackPayment(request.order, request.payment)
 
-    @PutMapping
+    @PostMapping("/refund")
     @Operation(
         summary = "Refunds payment",
         responses = [

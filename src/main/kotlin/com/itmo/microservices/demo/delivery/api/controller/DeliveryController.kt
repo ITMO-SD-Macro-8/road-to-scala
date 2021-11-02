@@ -18,7 +18,7 @@ class DeliveryController(
     private val deliveryService: DeliveryService
 ) {
 
-    @PostMapping
+    @PostMapping("/getTimeSlot")
     @Operation(
         summary = "Get nearest available time slot or NULL",
         responses = [
@@ -31,7 +31,7 @@ class DeliveryController(
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
     ): TimeSlot? = deliveryService.getNearestTimeSlot(preferredTimeSlot)
 
-    @PutMapping
+    @PostMapping("/reserveTimeSlot")
     @Operation(
         summary = "Reserve time slot",
         responses = [
@@ -39,7 +39,7 @@ class DeliveryController(
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
         ]
     )
-    fun rollback(
+    fun reserveTimeSlot(
         @RequestBody model: OrderTimeSlot,
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
     ): Boolean = deliveryService.reserveTimeSlot(model.order, model.timeSlot)
