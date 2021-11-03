@@ -1,6 +1,6 @@
 package com.itmo.microservices.demo.delivery.api.controller
 
-import com.itmo.microservices.demo.delivery.api.models.OrderTimeSlot
+import com.itmo.microservices.demo.delivery.api.dto.OrderTimeSlotDto
 import com.itmo.microservices.demo.delivery.impl.entity.TimeSlot
 import com.itmo.microservices.demo.delivery.impl.service.DeliveryService
 import io.swagger.v3.oas.annotations.Operation
@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 import java.util.*
 
 @RestController
@@ -20,27 +21,27 @@ class DeliveryController(
 
     @PostMapping("/getTimeSlot")
     @Operation(
-        summary = "Get nearest available time slot or NULL",
+        summary = "Gets nearest available time slot or NULL",
         responses = [
             ApiResponse(description = "OK", responseCode = "200"),
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
         ]
     )
     fun getTimeSlot(
-        @RequestBody preferredTimeSlot: Date,
+        @RequestBody preferredTimeSlot: LocalDate,
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
     ): TimeSlot? = deliveryService.getNearestTimeSlot(preferredTimeSlot)
 
     @PostMapping("/reserveTimeSlot")
     @Operation(
-        summary = "Reserve time slot",
+        summary = "Reserves time slot",
         responses = [
             ApiResponse(description = "OK", responseCode = "200"),
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
         ]
     )
     fun reserveTimeSlot(
-        @RequestBody model: OrderTimeSlot,
+        @RequestBody model: OrderTimeSlotDto,
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
     ): Boolean = deliveryService.reserveTimeSlot(model.order, model.timeSlot)
 }
