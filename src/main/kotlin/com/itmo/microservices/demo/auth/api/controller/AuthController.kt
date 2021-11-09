@@ -1,7 +1,7 @@
 package com.itmo.microservices.demo.auth.api.controller
 
 import com.itmo.microservices.demo.auth.api.model.AuthenticationRequest
-import com.itmo.microservices.demo.auth.api.model.AuthenticationResult
+import com.itmo.microservices.demo.auth.api.model.TokenResponseDto
 import com.itmo.microservices.demo.auth.api.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/authentication")
+@RequestMapping("/auth")
 class AuthController(private val authService: AuthService) {
 
     @PostMapping
@@ -26,7 +26,7 @@ class AuthController(private val authService: AuthService) {
             ApiResponse(description = "Invalid password", responseCode = "403", content = [Content()])
         ]
     )
-    fun authenticate(@RequestBody request: AuthenticationRequest): AuthenticationResult =
+    fun authenticate(@RequestBody request: AuthenticationRequest): TokenResponseDto =
             authService.authenticate(request)
 
     @PostMapping("/refresh")
@@ -38,6 +38,6 @@ class AuthController(private val authService: AuthService) {
         ],
         security = [SecurityRequirement(name = "bearerAuth")]
     )
-    fun refresh(authentication: Authentication): AuthenticationResult =
+    fun refresh(authentication: Authentication): TokenResponseDto =
             authService.refresh(authentication)
 }
