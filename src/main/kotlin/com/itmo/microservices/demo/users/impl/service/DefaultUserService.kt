@@ -5,16 +5,14 @@ import com.itmo.microservices.commonlib.annotations.InjectEventLogger
 import com.itmo.microservices.commonlib.logging.EventLogger
 import com.itmo.microservices.demo.common.exception.NotFoundException
 import com.itmo.microservices.demo.users.api.messaging.UserCreatedEvent
+import com.itmo.microservices.demo.users.api.model.*
 import com.itmo.microservices.demo.users.api.service.UserService
 import com.itmo.microservices.demo.users.impl.entity.AppUser
-import com.itmo.microservices.demo.users.api.model.AppUserModel
-import com.itmo.microservices.demo.users.api.model.RegistrationRequest
-import com.itmo.microservices.demo.users.api.model.RestorePasswordRequest
-import com.itmo.microservices.demo.users.api.model.VerifyNewPasswordRequest
 import com.itmo.microservices.demo.users.impl.logging.UserServiceNotableEvents
 import com.itmo.microservices.demo.users.impl.repository.PasswordRestorationRepository
 import com.itmo.microservices.demo.users.impl.repository.UserRepository
 import com.itmo.microservices.demo.users.impl.util.toModel
+import com.sun.mail.util.UUDecoderStream
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UserDetails
@@ -42,10 +40,11 @@ class DefaultUserService(private val userRepository: UserRepository,
             .findAppUserByUsername(username)
             .orElse(null)?.toModel()
 
-    override fun registerUser(request: RegistrationRequest) {
+    override fun registerUser(request: RegistrationRequest) : UserDto {
         val userEntity = userRepository.save(request.toEntity())
         eventBus.post(UserCreatedEvent(userEntity.toModel()))
         eventLogger.info(UserServiceNotableEvents.I_USER_CREATED, userEntity.username)
+        return UserDto(userEntity.id, userEntity.username)
     }
 
     override fun requestPasswordRestore(request: RestorePasswordRequest) {
@@ -70,14 +69,16 @@ class DefaultUserService(private val userRepository: UserRepository,
         passwordRestorationRepository.delete(restorationModel)
     }
 
-    override fun getAccountData(requester: UserDetails): AppUserModel =
-            userRepository.findAppUserByUsername(requester.username).orElseThrow {
-                throw NotFoundException("User ${requester.username} not found")
-            }.toModel()
+    override fun getAccountData(requester: UUID): UserDto {
+        val user = userRepository.findById(requester).orElseThrow {
+            throw NotFoundException("User $requester not found")
+        }
+
+        return UserDto(user.id, user.username)
+    }
 
     fun RegistrationRequest.toEntity(): AppUser =
         AppUser(username = this.username,
-            email = this.email,
             password = passwordEncoder.encode(this.password)
         )
 }
