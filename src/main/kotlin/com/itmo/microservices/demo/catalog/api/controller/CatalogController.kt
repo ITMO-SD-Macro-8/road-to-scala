@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/catalog")
+@RequestMapping("/items")
 class CatalogController(
     private val catalogService: CatalogService
 ) {
@@ -25,7 +25,7 @@ class CatalogController(
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
         ]
     )
-    fun all(): List<CatalogItem> = catalogService.allCatalogItems()
+    fun all(@RequestParam available: Boolean): List<CatalogItem> = catalogService.allCatalogItems()
 
     @PutMapping
     @Operation(
