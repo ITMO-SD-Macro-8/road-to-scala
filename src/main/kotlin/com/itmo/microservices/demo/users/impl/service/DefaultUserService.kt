@@ -78,7 +78,7 @@ class DefaultUserService(private val userRepository: UserRepository,
     }
 
     fun RegistrationRequest.toEntity(): AppUser =
-        AppUser(username = this.username,
+        AppUser(username = this.name,
             password = passwordEncoder.encode(this.password)
         )
 }
