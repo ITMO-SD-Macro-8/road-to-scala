@@ -48,7 +48,7 @@ class UserController(private val userService: UserService) {
     fun verifyNewPassword(@RequestBody request: VerifyNewPasswordRequest)
         = userService.verifyNewPassword(request)
 
-    @GetMapping
+    @GetMapping("/{user_id}")
     @Operation(
         summary = "Get current user info",
         responses = [
@@ -57,6 +57,6 @@ class UserController(private val userService: UserService) {
         ],
         security = [SecurityRequirement(name = "bearerAuth")]
     )
-    fun getAccountData(@Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails, userId : UUID): UserDto =
+    fun getAccountData(@PathVariable("user_id") userId: UUID): UserDto =
             userService.getAccountData(userId)
 }
