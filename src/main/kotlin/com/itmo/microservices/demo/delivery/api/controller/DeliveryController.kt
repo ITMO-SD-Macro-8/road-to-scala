@@ -7,30 +7,28 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
-import java.util.*
 
 @RestController
 @RequestMapping("/delivery")
 class DeliveryController(
     private val deliveryService: DeliveryService
 ) {
-
-    @PostMapping("/getTimeSlot")
+    @GetMapping("/slots")
     @Operation(
-        summary = "Gets nearest available time slot or NULL",
+        summary = "Получение возможных сейчас слотов доставки",
         responses = [
             ApiResponse(description = "OK", responseCode = "200"),
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
-        ]
+        ],
+        security = [SecurityRequirement(name = "bearerAuth")]
     )
     fun getTimeSlot(
-        @RequestBody preferredTimeSlot: LocalDate,
-        @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
-    ): TimeSlot? = deliveryService.getNearestTimeSlot(preferredTimeSlot)
+        @RequestParam number: Int
+    ): List<Int> = deliveryService.getPossibleTimeSlots(number)
 
     @PostMapping("/reserveTimeSlot")
     @Operation(

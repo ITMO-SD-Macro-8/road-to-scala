@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.util.*
 
 interface DeliveryService {
-    fun getNearestTimeSlot (preferredTimeSlot: LocalDate): TimeSlot?
+    fun getPossibleTimeSlots (number: Int): List<Int>
 
     fun reserveTimeSlot(order: OrderModel, timeSlot: TimeSlot): Boolean
 }

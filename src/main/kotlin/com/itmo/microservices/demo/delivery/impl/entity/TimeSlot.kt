@@ -1,7 +1,6 @@
 package com.itmo.microservices.demo.delivery.impl.entity
 
 import java.time.LocalDate
-import java.util.*
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
@@ -11,7 +10,7 @@ class TimeSlot {
 
     @Id
     @GeneratedValue
-    var id: UUID? = null
+    var id: Int? = null
     var startTime: LocalDate? = null
     var endTime: LocalDate? = null
 
@@ -20,7 +19,7 @@ class TimeSlot {
 
     constructor()
 
-    constructor(id: UUID?, startTime: LocalDate?, endTime: LocalDate?, reservedCount: Int?, reservedMax: Int?) {
+    constructor(id: Int?, startTime: LocalDate?, endTime: LocalDate?, reservedCount: Int?, reservedMax: Int?) {
         this.id = id
         this.startTime = startTime
         this.endTime = endTime
