@@ -1,13 +1,8 @@
 package com.itmo.microservices.demo.basket.api.controller
 
 import com.itmo.microservices.demo.basket.api.model.AddCatalogItemToBasket
-import com.itmo.microservices.demo.basket.api.model.DeleteCatalogItem
-import com.itmo.microservices.demo.basket.api.model.EditCatalogItemInBasket
 import com.itmo.microservices.demo.basket.api.service.BasketService
-import com.itmo.microservices.demo.basket.impl.entity.BasketEntity
 import com.itmo.microservices.demo.basket.impl.entity.BookingDto
-import com.itmo.microservices.demo.basket.impl.repository.BasketEntityRepository
-import com.itmo.microservices.demo.basket.impl.repository.BasketEntryRepository
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -32,7 +27,7 @@ class BasketController(private val basketService: BasketService) {
     fun getBasket(@Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetails)
         = basketService.getBasket(userDetails)
 
-    @PutMapping
+    @PostMapping
     @Operation(
         summary = "Add catalog item to basket",
         responses = [
