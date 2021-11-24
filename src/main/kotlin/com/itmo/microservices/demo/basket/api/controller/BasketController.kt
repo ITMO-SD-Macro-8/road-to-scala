@@ -51,7 +51,7 @@ class BasketController(
 
     @PostMapping
     @Operation(
-        summary = "Add catalog item to basket",
+        summary = "Создание нового заказа",
         responses = [
             ApiResponse(description = "OK", responseCode = "200"),
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
@@ -59,9 +59,7 @@ class BasketController(
         security = [SecurityRequirement(name = "bearerAuth")]
     )
     fun addCatalogItem(
-        @RequestBody request: AddCatalogItemToBasket,
-        @Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetails
-    ) = basketService.addCatalogItemToBasket(userDetails, request.catalogItemId, request.amount)
+    ) = OrderDto()
 
 
     @PutMapping("/{order_id}/items/{item_id}")
