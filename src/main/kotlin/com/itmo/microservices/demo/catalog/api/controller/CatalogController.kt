@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*
 class CatalogController(
     private val catalogService: CatalogService
 ) {
-
     @GetMapping
     @Operation(
         summary = "Returns catalog items",
