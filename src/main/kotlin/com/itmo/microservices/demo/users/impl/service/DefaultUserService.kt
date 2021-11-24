@@ -3,6 +3,7 @@ package com.itmo.microservices.demo.users.impl.service
 import com.google.common.eventbus.EventBus
 import com.itmo.microservices.commonlib.annotations.InjectEventLogger
 import com.itmo.microservices.commonlib.logging.EventLogger
+import com.itmo.microservices.demo.common.exception.ConflictException
 import com.itmo.microservices.demo.common.exception.NotFoundException
 import com.itmo.microservices.demo.users.api.messaging.UserCreatedEvent
 import com.itmo.microservices.demo.users.api.model.*
@@ -41,6 +42,9 @@ class DefaultUserService(private val userRepository: UserRepository,
             .orElse(null)?.toModel()
 
     override fun registerUser(request: RegistrationRequest) : UserDto {
+        val exists = userRepository.findAppUserByUsername(request.name)
+        if (exists.isPresent)
+            throw ConflictException("User already exists")
         val userEntity = userRepository.save(request.toEntity())
         eventBus.post(UserCreatedEvent(userEntity.toModel()))
         eventLogger.info(UserServiceNotableEvents.I_USER_CREATED, userEntity.username)
