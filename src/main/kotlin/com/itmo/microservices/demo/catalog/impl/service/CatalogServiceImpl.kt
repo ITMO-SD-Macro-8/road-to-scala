@@ -12,7 +12,10 @@ class CatalogServiceImpl @Autowired constructor(
     private val catalogRepository: CatalogRepository
 ): CatalogService {
 
-    override fun allCatalogItems(): List<CatalogItem> = catalogRepository.findAll()
+    override fun allCatalogItems(available: Boolean): List<CatalogItem> = if (available)
+        catalogRepository.findAllAvailable()
+    else
+        catalogRepository.findAll()
 
     override fun addCatalogItem(catalogItemRequest: AddCatalogItemRequest)
         = catalogRepository.save(catalogItemRequest.toCatalogItem())
