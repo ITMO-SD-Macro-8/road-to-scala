@@ -3,8 +3,8 @@ spring:
     name: road-to-scala
   datasource:
     url: jdbc:postgresql://postgresql:5432/demo_db
-    username: sa
-    password: password
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
