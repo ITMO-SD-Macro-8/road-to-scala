@@ -24,7 +24,7 @@ class CatalogController(
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
         ]
     )
-    fun all(@RequestParam available: Boolean): List<CatalogItem> = catalogService.allCatalogItems()
+    fun all(@RequestParam available: Boolean): List<CatalogItem> = catalogService.allCatalogItems(available)
 
     @PutMapping
     @Operation(
