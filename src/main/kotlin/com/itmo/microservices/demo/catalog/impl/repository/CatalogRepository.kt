@@ -8,6 +8,6 @@ import java.util.*
 
 @Repository
 interface CatalogRepository: JpaRepository<CatalogItem, UUID> {
-    @Query("SELECT * from catalog_item WHERE amount > 0", nativeQuery = true)
+    @Query("SELECT * from catalog_item WHERE catalog_item.amount > 0", nativeQuery = true)
     fun findAllAvailable(): List<CatalogItem>
 }
