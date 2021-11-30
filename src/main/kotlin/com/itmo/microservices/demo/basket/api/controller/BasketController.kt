@@ -38,17 +38,6 @@ class BasketController(
     )
     fun getOrder(@PathVariable(name = "order_id") orderId: UUID) = OrderDto()
 
-    @GetMapping
-    @Operation(
-        summary = "Get catalog item list from basket",
-        responses = [
-            ApiResponse(description = "OK", responseCode = "200"),
-            ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
-        ]
-    )
-    fun getBasket(@Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetails)
-        = basketService.getBasket(userDetails)
-
     @PostMapping
     @Operation(
         summary = "Создание нового заказа",
