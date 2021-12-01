@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus
 import java.net.http.HttpResponse
 
 
-class ExternalServiceResponse<T>(response: HttpResponse<String>)
+class ExternalServiceResponse<T>(response: HttpResponse<String>, classType: Class<T>)
 {
     companion object {
         val gson = Gson()
@@ -26,7 +26,7 @@ class ExternalServiceResponse<T>(response: HttpResponse<String>)
 
         if (statusCode == HttpStatus.OK.value())
         {
-            result = gson.fromJson(response.body(), object: TypeToken<T>() {}.type)
+            result = gson.fromJson(response.body(), classType)
             error = null
         }
         else

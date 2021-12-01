@@ -26,7 +26,7 @@ abstract class Connector(protected val connectorParameters: ConnectorParameters)
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        return ExternalServiceResponse(response)
+        return ExternalServiceResponse(response, TResponse::class.java)
     }
 
     protected inline fun<reified TResponse> get(endpoint: String): ExternalServiceResponse<TResponse>
@@ -38,6 +38,6 @@ abstract class Connector(protected val connectorParameters: ConnectorParameters)
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        return ExternalServiceResponse(response)
+        return ExternalServiceResponse(response, TResponse::class.java)
     }
 }
