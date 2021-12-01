@@ -1,5 +1,8 @@
 package com.itmo.microservices.demo.external.core.transaction
 
-class TransactionRequest(
+import kotlinx.serialization.*
+
+@Serializable
+data class TransactionRequest(
     val clientSecret: String
 )

@@ -1,6 +1,6 @@
 package com.itmo.microservices.demo.external.core.transaction
 
 class ApiError (
-   val timestamp: Int,
+   val timestamp: Long,
    val message: String
 )
