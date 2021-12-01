@@ -4,27 +4,33 @@ import com.itmo.microservices.demo.external.core.connector.Connector
 import com.itmo.microservices.demo.external.core.connector.ConnectorParameters
 import com.itmo.microservices.demo.external.core.transaction.TransactionRequest
 import com.itmo.microservices.demo.external.core.transaction.TransactionResponse
-
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
+import com.itmo.microservices.demo.external.core.transaction.TransactionStatus
 
 class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
     : Connector(connectorParameters)
 {
+    val pollingTimeoutInMs: Long = 100
+
+    /**
+     * Polling
+     */
     fun makeTransaction(transactionRequest: TransactionRequest, endpoint: String)
     {
-        val response = post<TransactionRequest, TransactionResponse>(endpoint, transactionRequest)
+        var response = post<TransactionRequest, TransactionResponse>(endpoint, transactionRequest)
 
-        println(response.id)
-        println(response.cost)
-        println(response.delta)
-        println(response.status)
-        println(response.submitTime)
-        println(response.completedTime)
+        println("id is " + response.id)
+
+        var triesCount = 0
+        while(response.status == TransactionStatus.PENDING)
+        {
+            Thread.sleep(pollingTimeoutInMs)
+
+            response = get<TransactionResponse>("transactions/${response.id}")
+
+            triesCount++
+        }
+
+        println("Count $triesCount")
+        println(response)
     }
 }

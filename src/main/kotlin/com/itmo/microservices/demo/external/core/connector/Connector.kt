@@ -27,4 +27,16 @@ abstract class Connector(protected val connectorParameters: ConnectorParameters)
 
         return Json.decodeFromString(response.body())
     }
+
+    protected inline fun<reified TResponse> get(endpoint: String): TResponse
+    {
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("${connectorParameters.uri}$endpoint"))
+            .GET()
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return Json.decodeFromString(response.body())
+    }
 }
