@@ -1,4 +1,4 @@
-package com.itmo.microservices.demo.external.core.transaction
+package com.itmo.microservices.demo.external.core.transaction.models
 
 import kotlinx.serialization.*
 

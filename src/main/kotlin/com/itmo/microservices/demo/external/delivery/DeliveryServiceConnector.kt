@@ -2,8 +2,8 @@ package com.itmo.microservices.demo.external.delivery
 
 import com.itmo.microservices.demo.external.core.connector.Connector
 import com.itmo.microservices.demo.external.core.connector.ConnectorParameters
-import com.itmo.microservices.demo.external.core.transaction.TransactionRequest
-import com.itmo.microservices.demo.external.core.transaction.TransactionResponse
+import com.itmo.microservices.demo.external.core.transaction.models.TransactionRequest
+import com.itmo.microservices.demo.external.core.transaction.models.TransactionResponse
 import com.itmo.microservices.demo.external.core.transaction.TransactionStatus
 
 class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
@@ -18,14 +18,30 @@ class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
     {
         var response = post<TransactionRequest, TransactionResponse>(endpoint, transactionRequest)
 
-        println("id is " + response.id)
+        if (response.hasError)
+        {
+            errorsHandler.handle(response.statusCode, response.error!!)
+            return
+        }
+
+        var result = response.result!!
+
+        println("id is " + result.id)
 
         var triesCount = 0
-        while(response.status == TransactionStatus.PENDING)
+        while(result.status == TransactionStatus.PENDING)
         {
             Thread.sleep(pollingTimeoutInMs)
 
-            response = get<TransactionResponse>("transactions/${response.id}")
+            response = get("transactions/${result.id}")
+
+            if (response.hasError)
+            {
+                errorsHandler.handle(response.statusCode, response.error!!)
+                return
+            }
+
+            result = response.result!!
 
             triesCount++
         }

@@ -2,7 +2,7 @@ package com.itmo.microservices.demo
 
 import com.itmo.microservices.demo.external.core.connector.ConnectorParameters
 import com.itmo.microservices.demo.external.core.connector.ConnectorUser
-import com.itmo.microservices.demo.external.core.transaction.TransactionRequest
+import com.itmo.microservices.demo.external.core.transaction.models.TransactionRequest
 import com.itmo.microservices.demo.external.delivery.DeliveryServiceConnector
 import com.itmo.microservices.demo.external.payment.PaymentServiceConnector
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -12,9 +12,7 @@ import org.springframework.boot.runApplication
 class DemoServiceApplication
 
 fun main(args: Array<String>) {
-    //runApplication<DemoServiceApplication>(*args)
-
-    deliveryRequest()
+    runApplication<DemoServiceApplication>(*args)
 }
 
 // request-response

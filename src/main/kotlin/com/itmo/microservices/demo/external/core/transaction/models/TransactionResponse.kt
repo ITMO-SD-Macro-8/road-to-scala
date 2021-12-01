@@ -1,5 +1,6 @@
-package com.itmo.microservices.demo.external.core.transaction
+package com.itmo.microservices.demo.external.core.transaction.models
 
+import com.itmo.microservices.demo.external.core.transaction.TransactionStatus
 import kotlinx.serialization.*
 
 @Serializable

@@ -1,9 +1,9 @@
 package com.itmo.microservices.demo.external.core.connector
 
-import com.itmo.microservices.demo.external.core.transaction.TransactionResponse
+import com.itmo.microservices.demo.external.core.transaction.ExternalServiceResponse
+import com.itmo.microservices.demo.external.core.transaction.TransactionErrorsHandler
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.decodeFromString
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -11,9 +11,10 @@ import java.net.http.HttpResponse
 
 abstract class Connector(protected val connectorParameters: ConnectorParameters)
 {
-    val client: HttpClient = HttpClient.newBuilder().build()
+    protected val client: HttpClient = HttpClient.newBuilder().build()
+    protected val errorsHandler = TransactionErrorsHandler()
 
-    protected inline fun<reified TRequest, reified TResponse> post(endpoint: String, data: TRequest): TResponse
+    protected inline fun<reified TRequest, reified TResponse> post(endpoint: String, data: TRequest): ExternalServiceResponse<TResponse>
     {
         val body = Json.encodeToString(data);
 
@@ -25,18 +26,18 @@ abstract class Connector(protected val connectorParameters: ConnectorParameters)
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        return Json.decodeFromString(response.body())
+        return ExternalServiceResponse(response)
     }
 
-    protected inline fun<reified TResponse> get(endpoint: String): TResponse
+    protected inline fun<reified TResponse> get(endpoint: String): ExternalServiceResponse<TResponse>
     {
         val request = HttpRequest.newBuilder()
             .uri(URI.create("${connectorParameters.uri}$endpoint"))
             .GET()
             .build()
 
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        return Json.decodeFromString(response.body())
+        return ExternalServiceResponse(response)
     }
 }
