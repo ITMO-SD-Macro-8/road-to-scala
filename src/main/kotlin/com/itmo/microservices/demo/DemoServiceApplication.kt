@@ -12,9 +12,7 @@ import org.springframework.boot.runApplication
 class DemoServiceApplication
 
 fun main(args: Array<String>) {
-    //runApplication<DemoServiceApplication>(*args)
-
-    deliveryRequest()
+    runApplication<DemoServiceApplication>(*args)
 }
 
 // request-response
