@@ -9,7 +9,7 @@ import com.itmo.microservices.demo.external.core.transaction.TransactionStatus
 class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
     : Connector(connectorParameters)
 {
-    val pollingTimeoutInMs: Long = 100
+    private val pollingTimeoutInMs: Long = 10
 
     /**
      * Polling

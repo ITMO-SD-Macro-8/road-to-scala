@@ -1,6 +1,5 @@
 package com.itmo.microservices.demo.external.core.transaction
 
-import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
 import com.itmo.microservices.demo.external.core.transaction.models.ApiError
 import org.springframework.http.HttpStatus

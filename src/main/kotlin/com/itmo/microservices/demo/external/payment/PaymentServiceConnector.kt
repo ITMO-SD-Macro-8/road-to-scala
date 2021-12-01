@@ -21,13 +21,9 @@ class PaymentServiceConnector(connectorParameters: ConnectorParameters)
             return
         }
 
-        var result = response.result!!
+        val result = response.result!!
 
-        println(result.id)
-        println(result.cost)
-        println(result.delta)
-        println(result.status)
-        println(result.submitTime)
-        println(result.completedTime)
+        println(result)
+        println()
     }
 }
