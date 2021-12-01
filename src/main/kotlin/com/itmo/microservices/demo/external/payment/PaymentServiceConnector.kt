@@ -1,29 +1,31 @@
 package com.itmo.microservices.demo.external.payment
 
-import com.itmo.microservices.demo.external.core.connector.Connector
+import com.itmo.microservices.demo.external.core.connector.ExternalServiceConnector
 import com.itmo.microservices.demo.external.core.connector.ConnectorParameters
+import com.itmo.microservices.demo.external.core.transaction.ExternalServiceRequestException
 import com.itmo.microservices.demo.external.core.transaction.models.TransactionRequest
 import com.itmo.microservices.demo.external.core.transaction.models.TransactionResponse
 
 class PaymentServiceConnector(connectorParameters: ConnectorParameters)
-    : Connector(connectorParameters)
+    : ExternalServiceConnector(connectorParameters)
 {
     /**
      * Request-Response
      */
-    fun makeTransaction(transactionRequest: TransactionRequest, endpoint: String)
+    override fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest)
     {
-        val response = post<TransactionRequest, TransactionResponse>(endpoint, transactionRequest)
+        val result: TransactionResponse
 
-        if (response.hasError)
+        try
         {
-            errorsHandler.handle(response.statusCode, response.error!!)
+            result = post(endpoint, transactionRequest)
+        }
+        catch(e: ExternalServiceRequestException)
+        {
+            println(e.message)
             return
         }
 
-        val result = response.result!!
-
         println(result)
-        println()
     }
 }

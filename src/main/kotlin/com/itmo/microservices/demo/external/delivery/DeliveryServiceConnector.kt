@@ -1,30 +1,33 @@
 package com.itmo.microservices.demo.external.delivery
 
-import com.itmo.microservices.demo.external.core.connector.Connector
+import com.itmo.microservices.demo.external.core.connector.ExternalServiceConnector
 import com.itmo.microservices.demo.external.core.connector.ConnectorParameters
+import com.itmo.microservices.demo.external.core.transaction.ExternalServiceRequestException
 import com.itmo.microservices.demo.external.core.transaction.models.TransactionRequest
 import com.itmo.microservices.demo.external.core.transaction.models.TransactionResponse
 import com.itmo.microservices.demo.external.core.transaction.TransactionStatus
 
 class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
-    : Connector(connectorParameters)
+    : ExternalServiceConnector(connectorParameters)
 {
     private val pollingTimeoutInMs: Long = 10
 
     /**
      * Polling
      */
-    fun makeTransaction(transactionRequest: TransactionRequest, endpoint: String)
+    override fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest)
     {
-        var response = post<TransactionRequest, TransactionResponse>(endpoint, transactionRequest)
+        var result: TransactionResponse
 
-        if (response.hasError)
+        try
         {
-            errorsHandler.handle(response.statusCode, response.error!!)
+            result = post(endpoint, transactionRequest)
+        }
+        catch (e: ExternalServiceRequestException)
+        {
+            println(e.message)
             return
         }
-
-        var result = response.result!!
 
         println("id is " + result.id)
 
@@ -33,20 +36,20 @@ class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
         {
             Thread.sleep(pollingTimeoutInMs)
 
-            response = get("transactions/${result.id}")
-
-            if (response.hasError)
+            try
             {
-                errorsHandler.handle(response.statusCode, response.error!!)
+                result = get("transactions/${result.id}")
+            }
+            catch (e: ExternalServiceRequestException)
+            {
+                println(e.message)
                 return
             }
-
-            result = response.result!!
 
             triesCount++
         }
 
         println("Count $triesCount")
-        println(response)
+        println(result)
     }
 }

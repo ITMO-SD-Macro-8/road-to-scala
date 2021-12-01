@@ -4,8 +4,8 @@ import com.itmo.microservices.demo.external.core.transaction.models.ApiError
 
 class TransactionErrorsHandler
 {
-    fun handle(statusCode: Int, error: ApiError)
+    fun getErrorMessage(statusCode: Int, error: ApiError): String
     {
-        println("Transaction failed with error code $statusCode and message: \"${error.message}\"")
+        return "Transaction failed with error code $statusCode and message: \"${error.message}\""
     }
 }

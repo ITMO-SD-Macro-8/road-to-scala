@@ -1,7 +1,9 @@
 package com.itmo.microservices.demo.external.core.connector
 
+import com.itmo.microservices.demo.external.core.transaction.ExternalServiceRequestException
 import com.itmo.microservices.demo.external.core.transaction.ExternalServiceResponse
 import com.itmo.microservices.demo.external.core.transaction.TransactionErrorsHandler
+import com.itmo.microservices.demo.external.core.transaction.models.TransactionRequest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.net.URI
@@ -9,12 +11,12 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-abstract class Connector(protected val connectorParameters: ConnectorParameters)
+abstract class ExternalServiceConnector(protected val connectorParameters: ConnectorParameters)
 {
     protected val client: HttpClient = HttpClient.newBuilder().build()
     protected val errorsHandler = TransactionErrorsHandler()
 
-    protected inline fun<reified TRequest, reified TResponse> post(endpoint: String, data: TRequest): ExternalServiceResponse<TResponse>
+    protected inline fun<reified TRequest, reified TResponse> post(endpoint: String, data: TRequest): TResponse
     {
         val body = Json.encodeToString(data);
 
@@ -26,10 +28,10 @@ abstract class Connector(protected val connectorParameters: ConnectorParameters)
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        return ExternalServiceResponse(response, TResponse::class.java)
+        return getResult(response)
     }
 
-    protected inline fun<reified TResponse> get(endpoint: String): ExternalServiceResponse<TResponse>
+    protected inline fun<reified TResponse> get(endpoint: String): TResponse
     {
         val request = HttpRequest.newBuilder()
             .uri(URI.create("${connectorParameters.uri}$endpoint"))
@@ -38,6 +40,19 @@ abstract class Connector(protected val connectorParameters: ConnectorParameters)
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        return ExternalServiceResponse(response, TResponse::class.java)
+        return getResult(response)
     }
+
+    protected inline fun <reified TResponse> getResult(httpResponse: HttpResponse<String>): TResponse
+    {
+        val response = ExternalServiceResponse(httpResponse, TResponse::class.java)
+
+        if (!response.hasError) return response.result!!
+
+        val errorMessage = errorsHandler.getErrorMessage(response.statusCode, response.error!!)
+
+        throw ExternalServiceRequestException(errorMessage)
+    }
+
+    abstract fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest)
 }
