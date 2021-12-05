@@ -9,12 +9,12 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 @Configuration
-class EventBusConfig {
+open class EventBusConfig {
 
     @Bean(name = ["eventBusExecutor"])
-    fun eventBusExecutor(): ExecutorService = Executors.newFixedThreadPool(5)
+    open fun eventBusExecutor(): ExecutorService = Executors.newFixedThreadPool(5)
 
     @Bean
     @Suppress("UnstableApiUsage")
-    fun eventBus(@Qualifier("eventBusExecutor") executor: Executor) = AsyncEventBus(executor)
+    open fun eventBus(@Qualifier("eventBusExecutor") executor: Executor) = AsyncEventBus(executor)
 }
