@@ -19,7 +19,7 @@ class AuthController(private val authService: AuthService) {
 
     @PostMapping
     @Operation(
-        summary = "Authenticate",
+        summary = "Аутентификация",
         responses = [
             ApiResponse(description = "OK", responseCode = "200"),
             ApiResponse(description = "User not found", responseCode = "404", content = [Content()]),
@@ -31,7 +31,7 @@ class AuthController(private val authService: AuthService) {
 
     @PostMapping("/refresh")
     @Operation(
-        summary = "Refresh authentication",
+        summary = "Обновление токена",
         responses = [
             ApiResponse(description = "OK", responseCode = "200"),
             ApiResponse(description = "Authentication error", responseCode = "403", content = [Content()])

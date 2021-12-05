@@ -1,8 +1,5 @@
 package com.itmo.microservices.demo.users.api.messaging
 
-import com.itmo.microservices.demo.order.api.model.OrderModel
-import com.itmo.microservices.demo.users.api.model.AppUserModel
+import com.itmo.microservices.demo.users.api.model.UserAppModel
 
-data class UserCreatedEvent(val user: AppUserModel)
-
-data class OrderCreatedEvent(val order: OrderModel)
+data class UserCreatedEvent(val user: UserAppModel)
