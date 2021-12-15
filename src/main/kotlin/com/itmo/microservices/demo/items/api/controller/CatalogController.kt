@@ -24,17 +24,4 @@ class CatalogController(private val catalogItemService: CatalogItemService) {
     )
     fun all(@RequestParam available: Boolean): List<CatalogItemApiModel>
         = catalogItemService.allCatalogItems(available).map { it.toApiModel() }
-
-    @PutMapping
-    @Operation(
-        summary = "Put catalog item",
-        responses = [
-            ApiResponse(description = "OK", responseCode = "200"),
-            ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
-        ]
-    )
-    fun addCatalogItem(
-        @RequestBody request: AddCatalogItemRequest,
-        @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
-    ): CatalogItemApiModel = catalogItemService.addCatalogItem(request).toApiModel()
 }
