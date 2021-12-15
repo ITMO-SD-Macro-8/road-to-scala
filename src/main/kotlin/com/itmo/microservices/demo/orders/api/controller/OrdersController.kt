@@ -5,6 +5,7 @@ import com.itmo.microservices.demo.orders.api.service.OrderService
 import com.itmo.microservices.demo.orders.impl.entity.BookingDto
 import com.itmo.microservices.demo.orders.api.model.OrderApiModel
 import com.itmo.microservices.demo.orders.api.model.PaymentSubmissionApiModel
+import com.itmo.microservices.demo.orders.api.service.PaymentService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -15,7 +16,7 @@ import java.util.*
 
 @RestController
 @RequestMapping("/orders")
-class OrdersController(private val orderService: OrderService) {
+class OrdersController(private val orderService: OrderService, private val paymentService: PaymentService) {
 
     // @Aroize
 
@@ -95,7 +96,7 @@ class OrdersController(private val orderService: OrderService) {
         ],
         security = [SecurityRequirement(name = "bearerAuth")]
     )
-    fun payment(
+    fun payment(principal: Principal,
         @PathVariable(name = "order_id") orderId: UUID
-    ) = PaymentSubmissionApiModel()
+    ) = paymentService.paymentProceed(principal, orderId)
 }
