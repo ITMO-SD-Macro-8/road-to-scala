@@ -1,8 +1,9 @@
 package com.itmo.microservices.demo.orders.api.controller
 
 import com.itmo.microservices.demo.common.exception.BadRequestException
+import com.itmo.microservices.demo.delivery.impl.service.DeliveryService
 import com.itmo.microservices.demo.orders.api.service.OrderService
-import com.itmo.microservices.demo.orders.impl.entity.BookingDto
+import com.itmo.microservices.demo.orders.api.model.BookingDto
 import com.itmo.microservices.demo.orders.api.model.OrderApiModel
 import com.itmo.microservices.demo.orders.api.model.PaymentSubmissionApiModel
 import com.itmo.microservices.demo.orders.api.service.PaymentService
@@ -16,7 +17,10 @@ import java.util.*
 
 @RestController
 @RequestMapping("/orders")
-class OrdersController(private val orderService: OrderService, private val paymentService: PaymentService) {
+class OrdersController(private val orderService: OrderService,
+                       private val deliveryService: DeliveryService,
+                       private val paymentService: PaymentService
+) {
 
     // @Aroize
 
@@ -63,6 +67,7 @@ class OrdersController(private val orderService: OrderService, private val payme
     }
 
     // TODO @Coomman
+
     @PostMapping("/{order_id}/bookings")
     @Operation(summary = "Оформление (финализация/бронирование) заказа",
             responses = [
@@ -71,9 +76,9 @@ class OrdersController(private val orderService: OrderService, private val payme
             ],
             security = [SecurityRequirement(name = "bearerAuth")]
     )
-    fun bookingFinalization(
+    fun arrangeBooking(
         @PathVariable(name = "order_id") orderId: UUID
-    ) = BookingDto()
+    ) : BookingDto = orderService.arrangeBooking(orderId)
 
     @PostMapping("/{order_id}/delivery")
     @Operation(summary = "Установление желаемого времени доставки",
@@ -83,10 +88,10 @@ class OrdersController(private val orderService: OrderService, private val payme
         ],
         security = [SecurityRequirement(name = "bearerAuth")]
     )
-    fun chooseTimeSlot(
+    fun setPreferredTimeSlot(
         @PathVariable(name = "order_id") orderId: UUID,
         @RequestParam(name = "slot_in_sec") slotInSec: Int // Unix timestamp
-    ) = BookingDto()
+    ) : BookingDto = deliveryService.setPreferredTimeSlot(orderId, slotInSec)
 
     @PostMapping("/{order_id}/payment")
     @Operation(summary = "Оплата заказа",
@@ -96,7 +101,7 @@ class OrdersController(private val orderService: OrderService, private val payme
         ],
         security = [SecurityRequirement(name = "bearerAuth")]
     )
-    fun payment(principal: Principal,
+    fun pay(principal: Principal,
         @PathVariable(name = "order_id") orderId: UUID
     ) = paymentService.paymentProceed(principal, orderId)
 }

@@ -1,4 +1,4 @@
-package com.itmo.microservices.demo.orders.impl.entity
+package com.itmo.microservices.demo.orders.api.model
 
 import java.util.*
 

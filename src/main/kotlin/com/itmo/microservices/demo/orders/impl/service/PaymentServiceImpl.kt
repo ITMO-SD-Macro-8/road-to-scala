@@ -7,10 +7,8 @@ import com.itmo.microservices.demo.items.impl.repository.CatalogItemRepository
 import com.itmo.microservices.demo.orders.api.model.OrderStatus
 import com.itmo.microservices.demo.orders.api.model.PaymentStatus
 import com.itmo.microservices.demo.orders.api.model.PaymentSubmissionApiModel
-import com.itmo.microservices.demo.orders.api.service.OrderService
 import com.itmo.microservices.demo.orders.api.service.PaymentService
 import com.itmo.microservices.demo.orders.impl.entity.PaymentEntity
-import com.itmo.microservices.demo.orders.impl.repository.OrderPositionsRepository
 import com.itmo.microservices.demo.orders.impl.repository.OrderRepository
 import com.itmo.microservices.demo.orders.impl.repository.PaymentRepository
 import com.itmo.microservices.demo.users.api.model.UserAppModel
@@ -19,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 import java.security.Principal
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*

@@ -9,6 +9,7 @@ import com.itmo.microservices.demo.items.impl.repository.CatalogItemRepository
 import com.itmo.microservices.demo.orders.api.service.OrderService
 import com.itmo.microservices.demo.orders.api.model.OrderApiModel
 import com.itmo.microservices.demo.orders.api.model.OrderStatus
+import com.itmo.microservices.demo.orders.api.model.BookingDto
 import com.itmo.microservices.demo.orders.impl.entity.OrderEntity
 import com.itmo.microservices.demo.orders.impl.entity.OrderPositionEntity
 import com.itmo.microservices.demo.orders.impl.logging.OrderCreatedNotableEvent
@@ -17,14 +18,11 @@ import com.itmo.microservices.demo.orders.impl.repository.OrderRepository
 import com.itmo.microservices.demo.users.api.model.UserAppModel
 import com.itmo.microservices.demo.users.api.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.security.Principal
 import java.util.*
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
 
 @Service
 class OrderServiceImpl @Autowired constructor(
@@ -76,6 +74,18 @@ class OrderServiceImpl @Autowired constructor(
                 orderRepository.save(order)
             }
         }
+    }
+
+    override fun arrangeBooking(orderId: UUID): BookingDto {
+        val order = orderRepository.findById(orderId).orElseThrow { NotFoundException("No order with id = $orderId") }
+
+        when (order.status) {
+            OrderStatus.COLLECTING -> orderRepository.save(order.copy(status = OrderStatus.BOOKED))
+            OrderStatus.SHIPPING -> orderRepository.save(order.copy(status = OrderStatus.COMPLETED))
+            else -> throw BadRequestException("Can only book order with COLLECTING status or finalize it with SHIPPING status")
+        }
+
+        return BookingDto(id = order.id)
     }
 
     private fun extractUserFromPrincipal(authentication: Principal): UserAppModel {

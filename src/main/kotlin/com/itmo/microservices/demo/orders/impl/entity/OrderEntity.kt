@@ -7,7 +7,6 @@ import org.springframework.data.annotation.CreatedDate
 import java.time.Instant
 import java.util.*
 import javax.persistence.*
-import kotlin.collections.HashSet
 
 @Entity
 data class OrderEntity @JvmOverloads constructor(

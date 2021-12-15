@@ -1,6 +1,5 @@
 package com.itmo.microservices.demo.orders.api.model
 
-import com.itmo.microservices.demo.orders.impl.entity.BookingStatus
 import java.util.*
 
 data class BookingLogRecordApiModel(
