@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.*
 class DeliveryController(
     private val deliveryService: DeliveryService
 ) {
+    // @Coomman
     @GetMapping("/slots")
     @Operation(
-        summary = "Получение возможных сейчас слотов доставки",
+        summary = "Получение возможных слотов доставки",
         responses = [
             ApiResponse(description = "OK", responseCode = "200"),
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
@@ -22,6 +23,6 @@ class DeliveryController(
         security = [SecurityRequirement(name = "bearerAuth")]
     )
     fun getTimeSlot(
-        @RequestParam number: Int
-    ): List<Int> = deliveryService.getPossibleTimeSlots(number)
+        @RequestParam number: Int // number of slots we want to get
+    ): List<Int> = deliveryService.getPossibleTimeslots(number)
 }

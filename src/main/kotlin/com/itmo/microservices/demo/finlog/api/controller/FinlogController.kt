@@ -13,6 +13,8 @@ import java.util.*
 @RestController
 @RequestMapping("/finlog")
 class FinlogController {
+
+    //TODO @Coomman
     @GetMapping
     @Operation(
         summary = "Получение информации о финансовых операциях с аккаунтом пользователя",
@@ -21,5 +23,5 @@ class FinlogController {
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
         ]
     )
-    fun operations(@RequestParam(name = "order_id") orderId: UUID) = UserAccountFinancialLogRecordDto()
+    fun operations(@RequestParam(name = "order_id") orderId: UUID) = listOf<UserAccountFinancialLogRecordDto>()
 }

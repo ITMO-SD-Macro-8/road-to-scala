@@ -5,6 +5,7 @@ import com.itmo.microservices.demo.items.api.model.AddCatalogItemRequest
 import com.itmo.microservices.demo.items.api.model.CatalogItemApiModel
 import com.itmo.microservices.demo.items.api.service.CatalogItemService
 import com.itmo.microservices.demo.orders.api.model.BookingLogRecordApiModel
+import com.itmo.microservices.demo.orders.api.service.OrderService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -17,7 +18,8 @@ import java.util.*
 @RestController
 @RequestMapping("/_internal")
 class InternalController(
-    private val catalogItemService: CatalogItemService
+    private val catalogItemService: CatalogItemService,
+    private val orderService: OrderService
 ) {
 
     @PostMapping("/catalogItem")
@@ -33,6 +35,9 @@ class InternalController(
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
     ): CatalogItemApiModel = catalogItemService.addCatalogItem(request).toApiModel()
 
+
+    //TODO @Coomman
+
     @GetMapping("/bookingHistory/{bookingId}")
     @Operation(
         summary = "Получить список забронированных товаров по bookingId",
@@ -44,7 +49,8 @@ class InternalController(
     fun getBookingRecordsByBookingId(
         @PathVariable bookingId: UUID,
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
-    ): List<BookingLogRecordApiModel> = listOf(BookingLogRecordApiModel())
+    ): List<BookingLogRecordApiModel>
+    = listOf(BookingLogRecordApiModel())
 
     @GetMapping("/deliveryLog/{orderId}")
     @Operation(
@@ -57,5 +63,6 @@ class InternalController(
     fun getDeliveryHistoryByOrderId(
         @PathVariable orderId: UUID,
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
-    ): List<DeliveryInfoRecordApiModel> = listOf(DeliveryInfoRecordApiModel())
+    ): List<DeliveryInfoRecordApiModel>
+    = listOf(DeliveryInfoRecordApiModel())
 }

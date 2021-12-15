@@ -61,10 +61,9 @@ class OrdersController(private val orderService: OrderService) {
         orderService.putCatalogItemToOrder(orderId, itemId, amount)
     }
 
-    // @Coomman
-
+    // TODO @Coomman
     @PostMapping("/{order_id}/bookings")
-    @Operation(summary = "Add catalog item to basket",
+    @Operation(summary = "Оформление (финализация/бронирование) заказа",
             responses = [
                 ApiResponse(description = "OK", responseCode = "200"),
                 ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
@@ -73,6 +72,19 @@ class OrdersController(private val orderService: OrderService) {
     )
     fun bookingFinalization(
         @PathVariable(name = "order_id") orderId: UUID
+    ) = BookingDto()
+
+    @PostMapping("/{order_id}/delivery")
+    @Operation(summary = "Установление желаемого времени доставки",
+        responses = [
+            ApiResponse(description = "OK", responseCode = "200"),
+            ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
+        ],
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    fun chooseTimeSlot(
+        @PathVariable(name = "order_id") orderId: UUID,
+        @RequestParam(name = "slot_in_sec") slotInSec: Int // Unix timestamp
     ) = BookingDto()
 
     @PostMapping("/{order_id}/payment")
@@ -86,17 +98,4 @@ class OrdersController(private val orderService: OrderService) {
     fun payment(
         @PathVariable(name = "order_id") orderId: UUID
     ) = PaymentSubmissionApiModel()
-
-    @PostMapping("/{order_id}/delivery")
-    @Operation(summary = "Установление желаемого времени доставки",
-        responses = [
-            ApiResponse(description = "OK", responseCode = "200"),
-            ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
-        ],
-        security = [SecurityRequirement(name = "bearerAuth")]
-    )
-    fun chooseTimeSlot(
-        @PathVariable(name = "order_id") orderId: UUID,
-        @RequestParam(name = "slot_in_sec") slotInSec: Int
-    ) = BookingDto()
 }
