@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface PaymentRepository: JpaRepository<PaymentEntity, UUID>
+interface PaymentRepository: JpaRepository<PaymentEntity, UUID>{
+    fun findAllByOrderId(orderId: UUID): List<PaymentEntity>
+}

@@ -2,11 +2,11 @@ package com.itmo.microservices.demo.orders.api.model
 
 import java.util.*
 
-class OrderApiModel constructor(
+class OrderApiModel(
     val id: UUID = UUID.randomUUID(),
     val timeCreated: Long = System.currentTimeMillis(),
     val status: OrderStatus = OrderStatus.COMPLETED,
     val itemsMap: Map<UUID, Int> = emptyMap(),
-    val deliveryDuration: Int? = null,
-    val paymentHistory: List<PaymentLogRecordDto> = emptyList()
+    var deliveryDuration: Int? = null,
+    var paymentHistory: List<PaymentLogRecordDto> = emptyList()
 )

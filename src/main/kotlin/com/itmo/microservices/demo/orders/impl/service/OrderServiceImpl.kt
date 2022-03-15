@@ -15,6 +15,7 @@ import com.itmo.microservices.demo.orders.impl.entity.OrderPositionEntity
 import com.itmo.microservices.demo.orders.impl.logging.OrderCreatedNotableEvent
 import com.itmo.microservices.demo.orders.impl.repository.OrderPositionsRepository
 import com.itmo.microservices.demo.orders.impl.repository.OrderRepository
+import com.itmo.microservices.demo.orders.impl.repository.PaymentRepository
 import com.itmo.microservices.demo.users.api.model.UserAppModel
 import com.itmo.microservices.demo.users.api.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,7 +30,8 @@ class OrderServiceImpl @Autowired constructor(
     private val userService: UserService,
     private val orderRepository: OrderRepository,
     private val orderPositionsRepository: OrderPositionsRepository,
-    private val catalogItemRepository: CatalogItemRepository
+    private val catalogItemRepository: CatalogItemRepository,
+    private val paymentRepository: PaymentRepository
 ): OrderService {
 
     @InjectEventLogger
@@ -44,9 +46,13 @@ class OrderServiceImpl @Autowired constructor(
 
     // Need to add info about delivery duration and payment histories
     override fun getOrderInfo(orderId: UUID): OrderApiModel {
-        return orderRepository.findById(orderId)
+        val apiModel = orderRepository.findById(orderId)
                 .orElseThrow { NotFoundException("No order with id = $orderId") }
                 .toApiModel()
+
+        apiModel.paymentHistory = paymentRepository.findAllByOrderId(orderId).map { p -> p.toLogRecord() }
+
+        return apiModel
     }
 
     override fun putCatalogItemToOrder(orderId: UUID, itemId: UUID, amount: Int) {

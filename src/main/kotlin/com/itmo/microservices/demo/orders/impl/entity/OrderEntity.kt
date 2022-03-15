@@ -3,16 +3,15 @@ package com.itmo.microservices.demo.orders.impl.entity
 import com.itmo.microservices.demo.orders.api.model.OrderApiModel
 import com.itmo.microservices.demo.orders.api.model.OrderStatus
 import com.itmo.microservices.demo.users.impl.entity.UserEntity
-import org.springframework.data.annotation.CreatedDate
 import java.time.Instant
 import java.util.*
 import javax.persistence.*
 
 @Entity
-data class OrderEntity @JvmOverloads constructor(
+data class OrderEntity(
     @Id val id: UUID = UUID.randomUUID(),
-    @Convert(converter = StatusConverter::class) val status: OrderStatus = OrderStatus.COLLECTING,
-    @CreatedDate @Column(name = "creation_time") val creationTime: Instant? = null,
+    @Enumerated(EnumType.ORDINAL) val status: OrderStatus = OrderStatus.COLLECTING,
+    @Column(name = "creation_time") val creationTime: Instant = Instant.now(),
     @OneToMany val positions: MutableSet<OrderPositionEntity> = hashSetOf(),
     @ManyToOne val owner: UserEntity,
 ) {
@@ -20,7 +19,7 @@ data class OrderEntity @JvmOverloads constructor(
     fun toApiModel() = OrderApiModel(
         id = id,
         status = status,
-        timeCreated = creationTime?.toEpochMilli() ?: 0,
+        timeCreated = creationTime.toEpochMilli(),
         itemsMap = positions.associate { it.catalogItemId to it.amount }
     )
 
@@ -29,10 +28,4 @@ data class OrderEntity @JvmOverloads constructor(
     }
 
     override fun hashCode(): Int = id.hashCode()
-
-    class StatusConverter: AttributeConverter<OrderStatus, Int> {
-        override fun convertToDatabaseColumn(status: OrderStatus): Int = status.type
-
-        override fun convertToEntityAttribute(status: Int): OrderStatus = OrderStatus.fromType(status)
-    }
 }

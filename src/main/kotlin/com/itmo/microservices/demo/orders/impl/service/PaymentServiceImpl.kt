@@ -29,7 +29,8 @@ class PaymentServiceImpl @Autowired constructor(
     private val catalogItemRepository: CatalogItemRepository,
     private val paymentRepository: PaymentRepository
 ): PaymentService {
-    override fun paymentProceed(principal: Principal, orderId: UUID) : PaymentSubmissionApiModel {
+    override fun paymentProceed(principal: Principal, orderId: UUID) : PaymentSubmissionApiModel
+    {
         val order = orderRepository.findById(orderId).orElseThrow { NotFoundException("No order with id = $orderId") }
         val user = extractUserFromPrincipal(principal)
         if (order.status != OrderStatus.BOOKED)
@@ -43,6 +44,7 @@ class PaymentServiceImpl @Autowired constructor(
             amount += item.amount * catalogItem.price
         }
 
+        //TODO: external system request
         val prPayment = PaymentEntity(timestamp = LocalDateTime.now().atZone(ZoneOffset.UTC).toEpochSecond(),
                                       operationtype = FinancialOperationType.WITHDRAW,
                                       status = PaymentStatus.SUCCESS,
