@@ -13,4 +13,4 @@ import org.springframework.context.annotation.Configuration
     type = SecuritySchemeType.HTTP,
     scheme = "bearer"
 )
-class OpenApiConfig
+open class OpenApiConfig

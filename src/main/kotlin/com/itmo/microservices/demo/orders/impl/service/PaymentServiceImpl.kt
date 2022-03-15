@@ -16,11 +16,13 @@ import com.itmo.microservices.demo.users.api.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.stereotype.Service
 import java.security.Principal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
 
+@Service
 class PaymentServiceImpl @Autowired constructor(
     private val userService: UserService,
     private val orderRepository: OrderRepository,

@@ -9,7 +9,7 @@ import kotlin.reflect.full.memberFunctions
 
 @Configuration
 @Suppress("UnstableApiUsage")
-class EventBusSubscriberPostProcessor(private val eventBus: EventBus): BeanPostProcessor {
+open class EventBusSubscriberPostProcessor(private val eventBus: EventBus): BeanPostProcessor {
 
     override fun postProcessAfterInitialization(bean: Any, beanName: String): Any {
         runCatching {

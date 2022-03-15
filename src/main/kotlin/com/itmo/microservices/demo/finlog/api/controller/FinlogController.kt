@@ -1,8 +1,6 @@
 package com.itmo.microservices.demo.finlog.api.controller
 
-import com.itmo.microservices.demo.finlog.api.model.UserAccountFinancialLogRecordDto
 import com.itmo.microservices.demo.finlog.api.service.FinlogService
-import com.itmo.microservices.demo.orders.api.service.OrderService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -17,17 +15,6 @@ import java.util.*
 @RequestMapping("/finlog")
 class FinlogController (private val finlogService: FinlogService) {
 
-    //TODO @Coomman
-    @GetMapping
-    @Operation(
-        summary = "Получение информации о финансовых операциях с аккаунтом пользователя",
-        responses = [
-            ApiResponse(description = "OK", responseCode = "200"),
-            ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
-        ]
-    )
-    fun operations(principal: Principal) = finlogService.operations(principal)
-
     @GetMapping
     @Operation(
         summary = "Получение информации о финансовых операциях с аккаунтом пользователя и заказами",
@@ -36,5 +23,5 @@ class FinlogController (private val finlogService: FinlogService) {
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
         ]
     )
-    fun operationsWithOrder(principal: Principal, @RequestParam(name = "order_id") orderId: UUID) = finlogService.operationsWithOrder(principal, orderId)
+    fun operationsWithOrder(principal: Principal, @RequestParam(name = "order_id", required = false) orderId: UUID) = finlogService.operationsWithOrder(principal, orderId)
 }

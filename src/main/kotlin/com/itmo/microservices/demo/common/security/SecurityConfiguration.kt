@@ -11,13 +11,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
-class SecurityConfiguration(
+open class SecurityConfiguration(
         private val authenticationFilter: JwtAuthenticationFilter,
         private val refreshAuthenticationFilter: RefreshJwtAuthenticationFilter
 ) : WebSecurityConfigurerAdapter() {
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
+    open fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     override fun configure(http: HttpSecurity) {
         http
