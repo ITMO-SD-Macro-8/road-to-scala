@@ -1,5 +1,6 @@
 package com.itmo.microservices.demo.finlog.api.controller
 
+import com.itmo.microservices.demo.finlog.api.model.UserAccountFinancialLogRecordDto
 import com.itmo.microservices.demo.finlog.api.service.FinlogService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -23,5 +24,12 @@ class FinlogController (private val finlogService: FinlogService) {
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
         ]
     )
-    fun operationsWithOrder(principal: Principal, @RequestParam(name = "order_id", required = false) orderId: UUID) = finlogService.operationsWithOrder(principal, orderId)
+    fun operationsWithOrder(principal: Principal, @RequestParam(name = "order_id", required = false) orderId: UUID?): List<UserAccountFinancialLogRecordDto>
+    {
+        if (orderId == null){
+            return finlogService.operations(principal)
+        }
+
+        return finlogService.operationsWithOrder(principal, orderId)
+    }
 }

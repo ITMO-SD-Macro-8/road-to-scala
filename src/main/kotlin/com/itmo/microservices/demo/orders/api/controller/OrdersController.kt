@@ -66,7 +66,7 @@ class OrdersController(private val orderService: OrderService,
         orderService.putCatalogItemToOrder(orderId, itemId, amount)
     }
 
-    // TODO @Coomman
+    // Author Coomman
 
     @PostMapping("/{order_id}/bookings")
     @Operation(summary = "Оформление (финализация/бронирование) заказа",
@@ -90,7 +90,7 @@ class OrdersController(private val orderService: OrderService,
     )
     fun setPreferredTimeSlot(
         @PathVariable(name = "order_id") orderId: UUID,
-        @RequestParam(name = "slot_in_sec") slotInSec: Int // Unix timestamp
+        @RequestParam(name = "slot_in_sec") slotInSec: Int
     ) : BookingDto = deliveryService.setPreferredTimeSlot(orderId, slotInSec)
 
     @PostMapping("/{order_id}/payment")

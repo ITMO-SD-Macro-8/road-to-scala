@@ -35,8 +35,7 @@ class InternalController(
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
     ): CatalogItemApiModel = catalogItemService.addCatalogItem(request).toApiModel()
 
-
-    //TODO @Coomman
+    // Author: Cooomman
 
     @GetMapping("/bookingHistory/{bookingId}")
     @Operation(
@@ -54,7 +53,7 @@ class InternalController(
 
     @GetMapping("/deliveryLog/{orderId}")
     @Operation(
-        summary = "Получить список забронированных товаров по bookingId",
+        summary = "Получить историю доставки заказа по orderId",
         responses = [
             ApiResponse(description = "OK", responseCode = "200"),
             ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])

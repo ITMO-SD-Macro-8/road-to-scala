@@ -1,10 +1,8 @@
-package com.itmo.microservices.demo.finlog.api.service
+package com.itmo.microservices.demo.finlog.impl.service
 
 import com.itmo.microservices.demo.common.exception.BadRequestException
 import com.itmo.microservices.demo.finlog.api.model.UserAccountFinancialLogRecordDto
-import com.itmo.microservices.demo.items.impl.repository.CatalogItemRepository
-import com.itmo.microservices.demo.orders.impl.repository.OrderPositionsRepository
-import com.itmo.microservices.demo.orders.impl.repository.OrderRepository
+import com.itmo.microservices.demo.finlog.api.service.FinlogService
 import com.itmo.microservices.demo.orders.impl.repository.PaymentRepository
 import com.itmo.microservices.demo.users.api.model.UserAppModel
 import com.itmo.microservices.demo.users.api.service.UserService
@@ -18,17 +16,15 @@ import java.util.*
 @Service
 class FinlogServiceImpl @Autowired constructor(
     private val userService: UserService,
-    private val orderRepository: OrderRepository,
-    private val orderPositionsRepository: OrderPositionsRepository,
-    private val catalogItemRepository: CatalogItemRepository,
     private val paymentRepository: PaymentRepository
-) : FinlogService {
+) : FinlogService
+{
     override fun operations(principal: Principal): List<UserAccountFinancialLogRecordDto> {
         val user = extractUserFromPrincipal(principal)
         return paymentRepository.findAll()
                                 .filter {it.userId == user.id}
-                                .map { it ->
-                                      UserAccountFinancialLogRecordDto(type = it.operationtype,
+                                .map {
+                                    UserAccountFinancialLogRecordDto(type = it.operationtype,
                                                                        amount = it.amount,
                                                                        orderId = it.order.id,
                                                                        paymentTransactionId = it.transactionId,

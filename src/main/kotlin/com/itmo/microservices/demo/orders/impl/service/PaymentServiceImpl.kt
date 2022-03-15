@@ -44,7 +44,7 @@ class PaymentServiceImpl @Autowired constructor(
             amount += item.amount * catalogItem.price
         }
 
-        //TODO: external system request
+        //TODO: external payment service request
         val prPayment = PaymentEntity(timestamp = LocalDateTime.now().atZone(ZoneOffset.UTC).toEpochSecond(),
                                       operationtype = FinancialOperationType.WITHDRAW,
                                       status = PaymentStatus.SUCCESS,

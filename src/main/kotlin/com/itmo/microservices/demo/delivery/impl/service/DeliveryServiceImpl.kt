@@ -19,22 +19,19 @@ class DeliveryServiceImpl @Autowired constructor(
     ) : DeliveryService
 {
     override fun getPossibleTimeslots(number: Int): List<Int> {
-        val dateNow = LocalDate.now()
-
-        val tomorrowsTimeSlot = dateNow.plusDays(1).atTime(12, 0).atZone(ZoneOffset.UTC)
-
-        val list = arrayListOf(tomorrowsTimeSlot)
-        while (list.size != number){
-            list.add(list.last().plusDays(1))
-        }
-
-        return list.map { dt -> dt.toEpochSecond().toInt() }
+        //TODO: external delivery service request and log
+        return List(number) {Random().nextInt(20) + 1}.distinct().sorted()
     }
 
     override fun setPreferredTimeSlot(orderId: UUID, slotInSec: Int): BookingDto {
         val order = orderRepository.findById(orderId).orElseThrow{BadRequestException("No order with id = $orderId")}
-        val deliveryEntity = DeliveryEntity(order = order)
 
+        if (order.status != OrderStatus.PAID)
+            throw BadRequestException("Can SHIP only PAID orders")
+
+        //TODO Delivery log
+
+        val deliveryEntity = DeliveryEntity(order = order)
         deliveryRepository.save(deliveryEntity)
         orderRepository.save(order.copy(status = OrderStatus.SHIPPING))
 

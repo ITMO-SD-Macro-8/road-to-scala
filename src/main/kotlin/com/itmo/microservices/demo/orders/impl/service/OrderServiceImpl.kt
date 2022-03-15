@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.security.Principal
 import java.util.*
 
@@ -82,12 +83,25 @@ class OrderServiceImpl @Autowired constructor(
         }
     }
 
+    @Transactional
     override fun arrangeBooking(orderId: UUID): BookingDto {
         val order = orderRepository.findById(orderId).orElseThrow { NotFoundException("No order with id = $orderId") }
 
         when (order.status) {
-            OrderStatus.COLLECTING -> orderRepository.save(order.copy(status = OrderStatus.BOOKED))
-            OrderStatus.SHIPPING -> orderRepository.save(order.copy(status = OrderStatus.COMPLETED))
+            OrderStatus.COLLECTING -> {
+                orderRepository.save(order.copy(status = OrderStatus.BOOKED))
+
+                order.positions.forEach{ pos ->
+                    val item = catalogItemRepository.getById(pos.catalogItemId)
+                    catalogItemRepository.save(item.copy(amount = item.amount - pos.amount))
+                    //TODO BookingHistory Log
+                }
+            }
+            OrderStatus.SHIPPING -> {
+                orderRepository.save(order.copy(status = OrderStatus.COMPLETED))
+                //TODO external delivery service request (if OK => Completed, else => Refund)
+                //TODO Delivery Log
+            }
             else -> throw BadRequestException("Can only book order with COLLECTING status or finalize it with SHIPPING status")
         }
 
