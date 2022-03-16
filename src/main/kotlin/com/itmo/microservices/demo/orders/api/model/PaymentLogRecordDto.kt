@@ -2,7 +2,7 @@ package com.itmo.microservices.demo.orders.api.model
 
 import java.util.UUID
 
-class PaymentLogRecordDto constructor(
+class PaymentLogRecordDto(
     val timestamp: Long,
     val status: PaymentStatus,
     val amount: Int,

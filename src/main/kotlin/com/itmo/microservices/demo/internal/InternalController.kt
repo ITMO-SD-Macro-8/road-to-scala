@@ -1,11 +1,12 @@
 package com.itmo.microservices.demo.internal
 
 import com.itmo.microservices.demo.delivery.api.model.DeliveryInfoRecordApiModel
+import com.itmo.microservices.demo.delivery.impl.repository.DeliveryRepository
 import com.itmo.microservices.demo.items.api.model.AddCatalogItemRequest
 import com.itmo.microservices.demo.items.api.model.CatalogItemApiModel
 import com.itmo.microservices.demo.items.api.service.CatalogItemService
 import com.itmo.microservices.demo.orders.api.model.BookingLogRecordApiModel
-import com.itmo.microservices.demo.orders.api.service.OrderService
+import com.itmo.microservices.demo.orders.impl.repository.BookingLogRepository
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -19,7 +20,8 @@ import java.util.*
 @RequestMapping("/_internal")
 class InternalController(
     private val catalogItemService: CatalogItemService,
-    private val orderService: OrderService
+    private val bookingLogRepository: BookingLogRepository,
+    private val deliveryRepository: DeliveryRepository
 ) {
 
     @PostMapping("/catalogItem")
@@ -48,8 +50,7 @@ class InternalController(
     fun getBookingRecordsByBookingId(
         @PathVariable bookingId: UUID,
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
-    ): List<BookingLogRecordApiModel>
-    = listOf(BookingLogRecordApiModel())
+    ): List<BookingLogRecordApiModel> = bookingLogRepository.findAllByBookingId(bookingId).map{x -> x.toBookingLogRecordModel()}
 
     @GetMapping("/deliveryLog/{orderId}")
     @Operation(
@@ -62,6 +63,5 @@ class InternalController(
     fun getDeliveryHistoryByOrderId(
         @PathVariable orderId: UUID,
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
-    ): List<DeliveryInfoRecordApiModel>
-    = listOf(DeliveryInfoRecordApiModel())
+    ): List<DeliveryInfoRecordApiModel> = listOf(deliveryRepository.findByOrderId(orderId)!!.toDeliveryInfoModel())
 }

@@ -1,11 +1,10 @@
 package com.itmo.microservices.demo.orders.api.controller
 
 import com.itmo.microservices.demo.common.exception.BadRequestException
-import com.itmo.microservices.demo.delivery.impl.service.DeliveryService
+import com.itmo.microservices.demo.delivery.api.service.DeliveryService
 import com.itmo.microservices.demo.orders.api.service.OrderService
 import com.itmo.microservices.demo.orders.api.model.BookingDto
 import com.itmo.microservices.demo.orders.api.model.OrderApiModel
-import com.itmo.microservices.demo.orders.api.model.PaymentSubmissionApiModel
 import com.itmo.microservices.demo.orders.api.service.PaymentService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content

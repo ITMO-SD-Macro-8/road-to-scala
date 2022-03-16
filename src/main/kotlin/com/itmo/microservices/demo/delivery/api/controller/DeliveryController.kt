@@ -1,6 +1,6 @@
 package com.itmo.microservices.demo.delivery.api.controller
 
-import com.itmo.microservices.demo.delivery.impl.service.DeliveryService
+import com.itmo.microservices.demo.delivery.api.service.DeliveryService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse

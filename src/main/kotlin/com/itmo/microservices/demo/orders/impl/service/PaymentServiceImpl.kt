@@ -23,12 +23,13 @@ import java.time.ZoneOffset
 import java.util.*
 
 @Service
-class PaymentServiceImpl @Autowired constructor(
+class PaymentServiceImpl(
     private val userService: UserService,
     private val orderRepository: OrderRepository,
     private val catalogItemRepository: CatalogItemRepository,
     private val paymentRepository: PaymentRepository
 ): PaymentService {
+
     override fun paymentProceed(principal: Principal, orderId: UUID) : PaymentSubmissionApiModel
     {
         val order = orderRepository.findById(orderId).orElseThrow { NotFoundException("No order with id = $orderId") }
@@ -38,10 +39,8 @@ class PaymentServiceImpl @Autowired constructor(
 
         orderRepository.save(order.copy(status = OrderStatus.PAID))
 
-        var amount = 0
-        for (item in order.positions){
-            val catalogItem = catalogItemRepository.findById(item.catalogItemId).get()
-            amount += item.amount * catalogItem.price
+        val amount = order.positions.sumOf { item ->
+            item.amount * catalogItemRepository.findById(item.catalogItemId).orElseThrow().price
         }
 
         //TODO: external payment service request

@@ -1,24 +1,33 @@
 package com.itmo.microservices.demo.delivery.impl.entity
 
+import com.itmo.microservices.demo.delivery.api.model.DeliveryInfoRecordApiModel
 import com.itmo.microservices.demo.delivery.api.model.DeliverySubmissionOutcome
 import com.itmo.microservices.demo.orders.impl.entity.OrderEntity
+import java.time.Instant
 import java.util.*
 import javax.persistence.*
 
 @Entity
-data class DeliveryEntity @JvmOverloads constructor(
+data class DeliveryEntity(
     @Id val id: UUID = UUID.randomUUID(),
     @OneToOne val order: OrderEntity,
-    val timeslot: Int = 0,
+    val timeslot: Int,
     val status: DeliverySubmissionOutcome = DeliverySubmissionOutcome.SUCCESS,
     val attempts: Int = 1,
     val transactionId: UUID = UUID.randomUUID(),
-    val submissionStartedTime: Long = 1,
-    val submittedTime: Long = 2
-    ) {
-    override fun equals(other: Any?): Boolean {
+    val submissionStartedTime: Long = Instant.now().toEpochMilli(),
+    val submittedTime: Long
+)
+{
+    override fun equals(other: Any?): Boolean
+    {
         return if (other == null || other !is DeliveryEntity) false else id == other.id
     }
 
     override fun hashCode(): Int = id.hashCode()
+
+    fun toDeliveryInfoModel(): DeliveryInfoRecordApiModel
+    {
+        return DeliveryInfoRecordApiModel(outcome = status, attempts = attempts, submittedTime = submittedTime, submissionStartedTime = submissionStartedTime, transactionId = transactionId)
+    }
 }

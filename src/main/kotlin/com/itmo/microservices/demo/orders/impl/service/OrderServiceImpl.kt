@@ -4,15 +4,16 @@ import com.itmo.microservices.commonlib.annotations.InjectEventLogger
 import com.itmo.microservices.commonlib.logging.EventLogger
 import com.itmo.microservices.demo.common.exception.BadRequestException
 import com.itmo.microservices.demo.common.exception.NotFoundException
+import com.itmo.microservices.demo.delivery.impl.repository.DeliveryRepository
 import com.itmo.microservices.demo.items.impl.entity.CatalogItemEntity
 import com.itmo.microservices.demo.items.impl.repository.CatalogItemRepository
+import com.itmo.microservices.demo.orders.api.model.*
 import com.itmo.microservices.demo.orders.api.service.OrderService
-import com.itmo.microservices.demo.orders.api.model.OrderApiModel
-import com.itmo.microservices.demo.orders.api.model.OrderStatus
-import com.itmo.microservices.demo.orders.api.model.BookingDto
+import com.itmo.microservices.demo.orders.impl.entity.BookingLogEntity
 import com.itmo.microservices.demo.orders.impl.entity.OrderEntity
 import com.itmo.microservices.demo.orders.impl.entity.OrderPositionEntity
 import com.itmo.microservices.demo.orders.impl.logging.OrderCreatedNotableEvent
+import com.itmo.microservices.demo.orders.impl.repository.BookingLogRepository
 import com.itmo.microservices.demo.orders.impl.repository.OrderPositionsRepository
 import com.itmo.microservices.demo.orders.impl.repository.OrderRepository
 import com.itmo.microservices.demo.orders.impl.repository.PaymentRepository
@@ -23,8 +24,11 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.awt.print.Book
 import java.security.Principal
+import java.time.Instant
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Service
 class OrderServiceImpl @Autowired constructor(
@@ -32,7 +36,9 @@ class OrderServiceImpl @Autowired constructor(
     private val orderRepository: OrderRepository,
     private val orderPositionsRepository: OrderPositionsRepository,
     private val catalogItemRepository: CatalogItemRepository,
-    private val paymentRepository: PaymentRepository
+    private val paymentRepository: PaymentRepository,
+    private val bookingLogRepository: BookingLogRepository,
+    private val deliveryRepository: DeliveryRepository
 ): OrderService {
 
     @InjectEventLogger
@@ -47,20 +53,28 @@ class OrderServiceImpl @Autowired constructor(
 
     // Need to add info about delivery duration and payment histories
     override fun getOrderInfo(orderId: UUID): OrderApiModel {
-        val apiModel = orderRepository.findById(orderId)
+        val order = orderRepository.findById(orderId)
                 .orElseThrow { NotFoundException("No order with id = $orderId") }
-                .toApiModel()
 
+        val apiModel = order.toApiModel()
         apiModel.paymentHistory = paymentRepository.findAllByOrderId(orderId).map { p -> p.toLogRecord() }
+        apiModel.deliveryDuration = deliveryRepository.findByOrderId(orderId)?.timeslot
 
         return apiModel
     }
 
     override fun putCatalogItemToOrder(orderId: UUID, itemId: UUID, amount: Int) {
-        val order = orderRepository.findById(orderId).orElseThrow { NotFoundException("No order with id = $orderId") }
+        var order = orderRepository.findById(orderId).orElseThrow { NotFoundException("No order with id = $orderId") }
 
-        if (order.status != OrderStatus.COLLECTING)
-            throw BadRequestException("You can add items into orders only with COLLECTING status!")
+        if (order.status != OrderStatus.COLLECTING) {
+            if (order.status == OrderStatus.BOOKED) {
+                order = order.copy(status = OrderStatus.COLLECTING)
+                orderRepository.save(order)
+            }
+            else {
+                throw BadRequestException("You can add items into orders only with COLLECTING or BOOKED status!")
+            }
+        }
 
         val catalogItem = catalogItemRepository.findById(itemId)
                 .orElseThrow { NotFoundException("No catalog item with id = $itemId") }
@@ -89,23 +103,43 @@ class OrderServiceImpl @Autowired constructor(
 
         when (order.status) {
             OrderStatus.COLLECTING -> {
-                orderRepository.save(order.copy(status = OrderStatus.BOOKED))
+                val failedItems = HashSet<UUID>()
 
                 order.positions.forEach{ pos ->
                     val item = catalogItemRepository.getById(pos.catalogItemId)
-                    catalogItemRepository.save(item.copy(amount = item.amount - pos.amount))
-                    //TODO BookingHistory Log
+                    var status = BookingStatus.SUCCESS
+
+                    if (item.amount < pos.amount){
+                        failedItems.add(item.id)
+                        status = BookingStatus.FAILED
+                    }
+                    else{
+                        catalogItemRepository.save(item.copy(amount = item.amount - pos.amount))
+                    }
+
+                    bookingLogRepository.save(BookingLogEntity(status = status, bookingId = orderId, itemId = item.id, amount = pos.amount))
                 }
+
+                if (failedItems.size == order.positions.size)
+                    throw BadRequestException("No items can be booked (don't have enough)")
+
+                orderRepository.save(order.copy(status = OrderStatus.BOOKED, positions = order.positions.filter{ p -> !failedItems.contains(p.catalogItemId)}.toHashSet()))
+
+                return BookingDto(id = order.id, failedIds = failedItems)
             }
             OrderStatus.SHIPPING -> {
                 orderRepository.save(order.copy(status = OrderStatus.COMPLETED))
-                //TODO external delivery service request (if OK => Completed, else => Refund)
-                //TODO Delivery Log
+                //TODO external delivery service request (COMPLETED / REFUND)
             }
-            else -> throw BadRequestException("Can only book order with COLLECTING status or finalize it with SHIPPING status")
+            else -> throw BadRequestException("Can only BOOK order with COLLECTING status or FINALIZE it with SHIPPING status")
         }
 
         return BookingDto(id = order.id)
+    }
+
+    override fun getBookingLog(bookingId: UUID): List<BookingLogRecordApiModel>
+    {
+        return bookingLogRepository.findAllByBookingId(bookingId).map{x -> x.toBookingLogRecordModel()}
     }
 
     private fun extractUserFromPrincipal(authentication: Principal): UserAppModel {

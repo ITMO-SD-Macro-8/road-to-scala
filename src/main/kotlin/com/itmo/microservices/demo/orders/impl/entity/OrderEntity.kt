@@ -13,7 +13,7 @@ data class OrderEntity(
     @Enumerated(EnumType.ORDINAL) val status: OrderStatus = OrderStatus.COLLECTING,
     @Column(name = "creation_time") val creationTime: Instant = Instant.now(),
     @OneToMany val positions: MutableSet<OrderPositionEntity> = hashSetOf(),
-    @ManyToOne val owner: UserEntity,
+    @ManyToOne val owner: UserEntity
 ) {
 
     fun toApiModel() = OrderApiModel(

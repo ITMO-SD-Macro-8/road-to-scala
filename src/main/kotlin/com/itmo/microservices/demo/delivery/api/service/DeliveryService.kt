@@ -1,4 +1,4 @@
-package com.itmo.microservices.demo.delivery.impl.service
+package com.itmo.microservices.demo.delivery.api.service
 
 import com.itmo.microservices.demo.orders.api.model.BookingDto
 import java.util.*

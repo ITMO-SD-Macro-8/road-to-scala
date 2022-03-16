@@ -12,7 +12,11 @@ import org.springframework.boot.runApplication
 open class DemoServiceApplication
 
 fun main(args: Array<String>) {
-    runApplication<DemoServiceApplication>(*args)
+    //runApplication<DemoServiceApplication>(*args)
+
+    for (i in 1 .. 20){
+        paymentRequest()
+    }
 }
 
 // request-response
@@ -23,7 +27,7 @@ fun paymentRequest() {
     val connector = PaymentServiceConnector(settings);
 
     val transaction = TransactionRequest(user.clientSecret)
-    connector.makeTransaction( "transactions", transaction,)
+    connector.makeTransaction( "transactions", transaction)
 }
 
 // polling
