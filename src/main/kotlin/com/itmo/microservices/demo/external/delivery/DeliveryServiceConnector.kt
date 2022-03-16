@@ -15,7 +15,7 @@ class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
     /**
      * Polling
      */
-    override fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest)
+    override fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest): TransactionResponse
     {
         var result: TransactionResponse
 
@@ -26,7 +26,7 @@ class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
         catch (e: ExternalServiceRequestException)
         {
             println(e.message)
-            return
+            throw NotImplementedError()
         }
 
         println("id is " + result.id)
@@ -43,7 +43,7 @@ class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
             catch (e: ExternalServiceRequestException)
             {
                 println(e.message)
-                return
+                throw NotImplementedError()
             }
 
             triesCount++
@@ -51,5 +51,7 @@ class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
 
         println("Count $triesCount")
         println(result)
+
+        return result
     }
 }

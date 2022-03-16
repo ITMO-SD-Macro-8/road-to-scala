@@ -1,6 +1,6 @@
 package com.itmo.microservices.demo.external.core.connector
 
-open class ConnectorParameters(
+class ConnectorParameters(
     val uri: String,
     val user: ConnectorUser
 )

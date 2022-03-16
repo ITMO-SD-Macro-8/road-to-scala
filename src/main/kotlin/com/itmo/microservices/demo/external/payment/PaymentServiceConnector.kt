@@ -12,20 +12,8 @@ class PaymentServiceConnector(connectorParameters: ConnectorParameters)
     /**
      * Request-Response
      */
-    override fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest)
+    override fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest): TransactionResponse
     {
-        val result: TransactionResponse
-
-        try
-        {
-            result = post(endpoint, transactionRequest)
-        }
-        catch(e: ExternalServiceRequestException)
-        {
-            println(e.message)
-            return
-        }
-
-        println(result)
+        return post(endpoint, transactionRequest)
     }
 }

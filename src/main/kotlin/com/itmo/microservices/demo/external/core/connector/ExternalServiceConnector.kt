@@ -4,6 +4,7 @@ import com.itmo.microservices.demo.external.core.transaction.ExternalServiceRequ
 import com.itmo.microservices.demo.external.core.transaction.ExternalServiceResponse
 import com.itmo.microservices.demo.external.core.transaction.TransactionErrorsHandler
 import com.itmo.microservices.demo.external.core.transaction.models.TransactionRequest
+import com.itmo.microservices.demo.external.core.transaction.models.TransactionResponse
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.net.URI
@@ -54,5 +55,5 @@ abstract class ExternalServiceConnector(protected val connectorParameters: Conne
         throw ExternalServiceRequestException(errorMessage)
     }
 
-    abstract fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest)
+    abstract fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest): TransactionResponse
 }

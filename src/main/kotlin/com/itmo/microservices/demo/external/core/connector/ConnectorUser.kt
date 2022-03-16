@@ -1,5 +1,5 @@
 package com.itmo.microservices.demo.external.core.connector
 
-open class ConnectorUser(
+class ConnectorUser(
     val clientSecret: String
 )
