@@ -8,5 +8,5 @@ import java.util.*
 
 @Repository
 interface DeliveryRepository: JpaRepository<DeliveryEntity, UUID>{
-    fun findByOrderId(orderId: UUID): DeliveryEntity?
+    fun findAllByOrderId(orderId: UUID): List<DeliveryEntity>
 }

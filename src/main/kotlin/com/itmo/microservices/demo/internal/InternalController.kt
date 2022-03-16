@@ -63,5 +63,5 @@ class InternalController(
     fun getDeliveryHistoryByOrderId(
         @PathVariable orderId: UUID,
         @Parameter(hidden = true) @AuthenticationPrincipal user: UserDetails
-    ): List<DeliveryInfoRecordApiModel> = listOf(deliveryRepository.findByOrderId(orderId)!!.toDeliveryInfoModel())
+    ): List<DeliveryInfoRecordApiModel> = deliveryRepository.findAllByOrderId(orderId).map { x -> x.toDeliveryInfoModel() }
 }

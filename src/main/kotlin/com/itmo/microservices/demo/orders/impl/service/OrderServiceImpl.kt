@@ -4,7 +4,15 @@ import com.itmo.microservices.commonlib.annotations.InjectEventLogger
 import com.itmo.microservices.commonlib.logging.EventLogger
 import com.itmo.microservices.demo.common.exception.BadRequestException
 import com.itmo.microservices.demo.common.exception.NotFoundException
+import com.itmo.microservices.demo.delivery.api.model.DeliverySubmissionOutcome
 import com.itmo.microservices.demo.delivery.impl.repository.DeliveryRepository
+import com.itmo.microservices.demo.external.core.connector.ConnectorParameters
+import com.itmo.microservices.demo.external.core.connector.ConnectorUser
+import com.itmo.microservices.demo.external.core.transaction.ExternalServiceRequestException
+import com.itmo.microservices.demo.external.core.transaction.TransactionStatus
+import com.itmo.microservices.demo.external.core.transaction.models.TransactionRequest
+import com.itmo.microservices.demo.external.core.transaction.models.TransactionResponse
+import com.itmo.microservices.demo.external.delivery.DeliveryServiceConnector
 import com.itmo.microservices.demo.items.impl.entity.CatalogItemEntity
 import com.itmo.microservices.demo.items.impl.repository.CatalogItemRepository
 import com.itmo.microservices.demo.orders.api.model.*
@@ -19,16 +27,14 @@ import com.itmo.microservices.demo.orders.impl.repository.OrderRepository
 import com.itmo.microservices.demo.orders.impl.repository.PaymentRepository
 import com.itmo.microservices.demo.users.api.model.UserAppModel
 import com.itmo.microservices.demo.users.api.service.UserService
+import org.hibernate.criterion.Order
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.awt.print.Book
 import java.security.Principal
-import java.time.Instant
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Service
 class OrderServiceImpl @Autowired constructor(
@@ -58,7 +64,7 @@ class OrderServiceImpl @Autowired constructor(
 
         val apiModel = order.toApiModel()
         apiModel.paymentHistory = paymentRepository.findAllByOrderId(orderId).map { p -> p.toLogRecord() }
-        apiModel.deliveryDuration = deliveryRepository.findByOrderId(orderId)?.timeslot
+        apiModel.deliveryDuration = deliveryRepository.findAllByOrderId(orderId).firstOrNull{x -> x.status == DeliverySubmissionOutcome.SUCCESS}?.timeslot
 
         return apiModel
     }
@@ -68,8 +74,8 @@ class OrderServiceImpl @Autowired constructor(
 
         if (order.status != OrderStatus.COLLECTING) {
             if (order.status == OrderStatus.BOOKED) {
-                order = order.copy(status = OrderStatus.COLLECTING)
-                orderRepository.save(order)
+                resetBooking(order, OrderStatus.COLLECTING)
+                order = orderRepository.findById(orderId).get()
             }
             else {
                 throw BadRequestException("You can add items into orders only with COLLECTING or BOOKED status!")
@@ -128,8 +134,14 @@ class OrderServiceImpl @Autowired constructor(
                 return BookingDto(id = order.id, failedIds = failedItems)
             }
             OrderStatus.SHIPPING -> {
-                orderRepository.save(order.copy(status = OrderStatus.COMPLETED))
-                //TODO external delivery service request (COMPLETED / REFUND)
+                val (result, _) = makeDeliveryRequest()
+
+                if (result.status == TransactionStatus.SUCCESS){
+                    orderRepository.save(order.copy(status = OrderStatus.COMPLETED))
+                }
+                else{
+                    resetBooking(order, OrderStatus.REFUND)
+                }
             }
             else -> throw BadRequestException("Can only BOOK order with COLLECTING status or FINALIZE it with SHIPPING status")
         }
@@ -142,6 +154,17 @@ class OrderServiceImpl @Autowired constructor(
         return bookingLogRepository.findAllByBookingId(bookingId).map{x -> x.toBookingLogRecordModel()}
     }
 
+    @Transactional
+    override fun resetBooking(order: OrderEntity, newStatus: OrderStatus)
+    {
+        orderRepository.save(order.copy(status = newStatus))
+
+        order.positions.forEach { pos ->
+            val item = catalogItemRepository.getById(pos.catalogItemId)
+            catalogItemRepository.save(item.copy(amount = item.amount + pos.amount))
+        }
+    }
+
     private fun extractUserFromPrincipal(authentication: Principal): UserAppModel {
         if (authentication !is Authentication)
             throw BadRequestException("Principal is not authenticated")
@@ -152,5 +175,27 @@ class OrderServiceImpl @Autowired constructor(
     private fun getOrCreateOrderPosition(order: OrderEntity, catalogItem: CatalogItemEntity): OrderPositionEntity {
         return order.positions.find { it.catalogItemId == catalogItem.id }
                 ?: OrderPositionEntity(catalogItemId = catalogItem.id, order = order, amount = 0)
+    }
+
+    override fun makeDeliveryRequest(): Pair<TransactionResponse, Int> {
+        val user = ConnectorUser("678391c3-dd29-46b9-b96e-d692699a0c66")
+        val settings = ConnectorParameters("http://77.234.215.138:30027/", user)
+
+        val connector = DeliveryServiceConnector(settings)
+
+        val transaction = TransactionRequest(user.clientSecret)
+
+        var attemptsCount = 1
+        while (true){
+            try
+            {
+                return Pair(connector.makeTransaction("transactions", transaction), attemptsCount)
+            }
+            catch (e: ExternalServiceRequestException){
+                print(e)
+            }
+
+            attemptsCount++;
+        }
     }
 }

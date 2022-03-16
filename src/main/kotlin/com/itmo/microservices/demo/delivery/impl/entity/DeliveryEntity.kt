@@ -12,10 +12,10 @@ data class DeliveryEntity(
     @Id val id: UUID = UUID.randomUUID(),
     @OneToOne val order: OrderEntity,
     val timeslot: Int,
-    val status: DeliverySubmissionOutcome = DeliverySubmissionOutcome.SUCCESS,
-    val attempts: Int = 1,
-    val transactionId: UUID = UUID.randomUUID(),
-    val submissionStartedTime: Long = Instant.now().toEpochMilli(),
+    val status: DeliverySubmissionOutcome,
+    val attempts: Int,
+    val transactionId: UUID,
+    val submissionStartedTime: Long,
     val submittedTime: Long
 )
 {

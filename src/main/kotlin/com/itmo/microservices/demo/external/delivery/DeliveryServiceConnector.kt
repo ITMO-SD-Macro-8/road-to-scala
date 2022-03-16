@@ -17,40 +17,14 @@ class DeliveryServiceConnector(connectorParameters: ConnectorParameters)
      */
     override fun makeTransaction(endpoint: String, transactionRequest: TransactionRequest): TransactionResponse
     {
-        var result: TransactionResponse
+        var result: TransactionResponse = post(endpoint, transactionRequest)
 
-        try
-        {
-            result = post(endpoint, transactionRequest)
-        }
-        catch (e: ExternalServiceRequestException)
-        {
-            println(e.message)
-            throw NotImplementedError()
-        }
-
-        println("id is " + result.id)
-
-        var triesCount = 0
         while(result.status == TransactionStatus.PENDING)
         {
             Thread.sleep(pollingTimeoutInMs)
 
-            try
-            {
-                result = get("transactions/${result.id}")
-            }
-            catch (e: ExternalServiceRequestException)
-            {
-                println(e.message)
-                throw NotImplementedError()
-            }
-
-            triesCount++
+            result = get("transactions/${result.id}")
         }
-
-        println("Count $triesCount")
-        println(result)
 
         return result
     }
