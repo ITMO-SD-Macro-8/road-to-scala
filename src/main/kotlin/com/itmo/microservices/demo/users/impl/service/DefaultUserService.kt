@@ -34,8 +34,8 @@ class DefaultUserService(private val userRepository: UserRepository,
             .orElse(null)?.toAppModel()
 
     override fun registerUser(request: RegistrationRequest) : UserAppModel {
-        if (isUsernameTaken(request.name))
-            throw ConflictException("Username with same name: ${request.name} already exists")
+        if (isUsernameTaken(request.username))
+            throw ConflictException("Username with same name: ${request.username} already exists")
         val user = createUserFromRequest(request).let { userRepository.save(it).toAppModel() }
         notifyUserCreated(user)
         return user
@@ -53,7 +53,7 @@ class DefaultUserService(private val userRepository: UserRepository,
     }
 
     private fun createUserFromRequest(request: RegistrationRequest): UserEntity = UserEntity(
-        username = request.name,
+        username = request.username,
         password = passwordEncoder.encode(request.password)
     )
 
